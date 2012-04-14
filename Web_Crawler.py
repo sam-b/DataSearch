@@ -100,18 +100,49 @@ def compute_ranks(graph):
             newranks[page] = newrank
         ranks = newranks
     return ranks
-	
-def lucky_search(index, ranks, keyword):
+
+def multi_lookup(index, query):
+    results = []
+    out = []
+    for words in query:
+        look = lookup(index,words)
+        for i in look:
+            out.append(i)
+    for h in out:
+        check = h
+        for i in out:
+            if check[0] == i[0] and check[1] + 1 == i[1]:
+                if check[0] not in results:
+                    results.append(check[0])
+    return results
+def lucky_search(index, ranks, keywords):
     best = 0
     out = ""
-    if keyword not in index:
+	result = multi_lookup(index,keywords)
+    if result == []:
         return None
-    for i in index[keyword]:
+    for i in result:
         if ranks[i] > best:
             best = ranks[i]
             out = i
     return out
+def quicksort(pages, ranks):
+	if not pages or len(pages) <= 1:
+		return pages
+	else:
+		pivot = ranks[pages[0]]
+		worse = []
+		better = []
+		for page in pages[1:]:
+			if ranks[page] <=pivot:
+				worse.append(page)
+			else:
+				better.append(page)
+		return quicksort(better,ranks) + [pages[0]] + quicksort(worse,ranks)
+def search(index, ranks, keyword):
+	pages = multi_lookup(index,keyword)
+	return quicksort(pages,ranks)
 	
-index, graph = crawl_web("http://www.engimagroup.org",10,100)
+index, graph = crawl_web("http://www.bbc.com",10,100)
 ranks = compute_ranks(graph)
 print lucky_search(index,ranks,"hello")
