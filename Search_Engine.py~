@@ -148,7 +148,7 @@ def quicksort(pages, ranks):
 				better.append(page)
 		return quicksort(better,ranks) + [pages[0]] + quicksort(worse,ranks)
 def search(index, ranks, keyword):
-	pages = lookup(index,keyword)
+	pages = multi_lookup(index,keyword)
 	return quicksort(pages,ranks)
 	
 index, graph = crawl_web("http://www.bbc.com",10,100)
